@@ -1,0 +1,66 @@
+{
+  "name": "dsh-doc-reader",
+  "version": "0.1.0",
+  "description": "Read PDF, DOCX, XLSX, PPTX, TXT/MD/CSV/HTML documents from disk or URL as agent tools — page/sheet/slide aware text extraction for DeepSeek Harness.",
+  "license": "MIT",
+  "author": "reg4916",
+  "type": "module",
+  "main": "index.js",
+  "icon": "./icon.svg",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "pdf",
+    "docx",
+    "xlsx",
+    "pptx",
+    "document",
+    "text-extraction"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "index.js",
+    "lib/**/*.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.11.2",
+    "jszip": "^3.10.2",
+    "mammoth": "^1.13.0",
+    "unpdf": "^1.9.1",
+    "xlsx": "^0.18.5"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2 || 0.2.1-rc.2 || 0.2.1-rc.3"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.3"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "check": "node --check index.js && node --check lib/read.js && node --check lib/readers.js"
+  }
+}

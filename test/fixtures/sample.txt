@@ -1,0 +1,4 @@
+Hello from the dsh-doc-reader text fixture.
+Привет, мир!
+This file is UTF-8 and mixes Latin and Cyrillic on purpose.
+Проверка: кириллица, тире — и кое-что ещё.

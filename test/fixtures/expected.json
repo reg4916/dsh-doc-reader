@@ -1,0 +1,95 @@
+{
+  "sample.txt": {
+    "format": "text",
+    "substrings": [
+      "Hello",
+      "Привет",
+      "UTF-8"
+    ]
+  },
+  "sample.md": {
+    "format": "text",
+    "substrings": [
+      "Sample Markdown Document",
+      "Первый пункт списка",
+      "def greet"
+    ]
+  },
+  "sample.csv": {
+    "format": "text",
+    "substrings": [
+      "Год",
+      "Выручка",
+      "2026"
+    ]
+  },
+  "sample.docx": {
+    "format": "docx",
+    "substrings": [
+      "DOCX-TITLE-MARKER",
+      "ДОКУМЕНТ-МАРКЕР",
+      "A1",
+      "C2"
+    ]
+  },
+  "sample.xlsx": {
+    "format": "xlsx",
+    "sheets": [
+      "Data",
+      "Second"
+    ],
+    "substrings": [
+      "Year",
+      "Revenue",
+      "Привет",
+      "MERGED-MARKER"
+    ],
+    "formula": {
+      "sheet": "Second",
+      "cell": "A4",
+      "expression": "=SUM(A2:A3)",
+      "cachedValue": 12
+    }
+  },
+  "sample.pptx": {
+    "format": "pptx",
+    "slides": 3,
+    "substrings": [
+      "SLIDE-1-TITLE",
+      "SLIDE-3-TITLE",
+      "NOTES-MARKER"
+    ]
+  },
+  "sample.pdf": {
+    "format": "pdf",
+    "pages": 3,
+    "substrings": [
+      "PAGE-1-MARKER",
+      "PAGE-2-MARKER",
+      "PAGE-3-MARKER"
+    ]
+  },
+  "empty.txt": {
+    "format": "text",
+    "empty": true,
+    "substrings": []
+  },
+  "empty.xlsx": {
+    "format": "xlsx",
+    "empty": true,
+    "sheets": [
+      "Sheet"
+    ],
+    "substrings": []
+  },
+  "not-a-docx.docx": {
+    "format": "docx",
+    "invalid": true,
+    "substrings": []
+  },
+  "corrupt.pdf": {
+    "format": "pdf",
+    "invalid": true,
+    "substrings": []
+  }
+}
