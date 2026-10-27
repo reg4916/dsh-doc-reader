@@ -66,18 +66,17 @@ INVOICE 2026-042
 - Local files: up to **50 MB**; URLs: downloaded with a **20 s timeout** and the same 50 MB cap.
 - **Private/local hosts are refused** (`localhost`, `127.0.0.1`, RFC1918, `.local`, `.internal`) so the tool cannot become an SSRF primitive. Download the file and pass a `path` instead.
 - Only `http(s)` URLs.
-- PDF text extraction is text-based: scanned PDFs (images only) return `(no extractable text on this page)`. OCR is on the roadmap.
+- PDF text extraction is text-based: scanned PDFs (images only) return `(no extractable text on this page)` — use `doc_ocr` for those.
 - DOCX conversion is handled by `mammoth`; charts, comments and tracked changes are not materialized as text.
 - XLSX returns displayed values, not formulas; rows are paged with `maxRows`.
 
 ## Install
 
-From the market (once published) or manually into a profile:
+Published on npm as [`dsh-doc-reader`](https://www.npmjs.com/package/dsh-doc-reader). Install from the built-in plugin market, or manually into a profile:
 
 ```bash
 cd ~/.dsh/profiles/desktop
-npx pnpm add link:~/dsh-plugins/dsh-doc-reader   # local development
-# or: npx pnpm add dsh-doc-reader                 # from npm
+npx pnpm add dsh-doc-reader
 ```
 
 Then add the bundle to the profile's `package.json`:
@@ -86,7 +85,11 @@ Then add the bundle to the profile's `package.json`:
 "dsh": { "profile": { "bundles": ["dsh-doc-reader", "..."] } }
 ```
 
-Restart DSH (the plugin loads on boot; DSH composition is all-or-nothing). The four tools appear in the next session.
+Restart DSH (the plugin loads on boot; DSH composition is all-or-nothing). The five tools appear in the next session.
+
+For local development, install the working copy instead: `npx pnpm add link:~/dsh-plugins/dsh-doc-reader`.
+
+> pnpm 12 may report an ignored build script for `tesseract.js`. That postinstall is only the OpenCollective banner — approve it with `pnpm approve-builds` or ignore it; OCR works either way.
 
 ## Develop
 
