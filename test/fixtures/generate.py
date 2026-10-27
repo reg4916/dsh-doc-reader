@@ -1,14 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""One-shot generator for the dsh-doc-reader fixture corpus.
+"""Regenerate the dsh-doc-reader fixture corpus.
 
-Runs inside test/fixtures only. Deleted after the corpus is verified.
-PDF is hand-crafted (uncompressed, Helvetica, 3 pages) so the page count and
-the literal PAGE-n-MARKER strings are deterministic for any extractor.
+Usage (bundled Python has python-docx / python-pptx / openpyxl):
+
+    /Users/a1/.dsh/dsh-runtimes/dsh-primary-runtime/dependencies/python/bin/python3 \
+        test/fixtures/generate.py
+
+Everything is written next to this script (test/fixtures/), nothing outside it.
+The script is idempotent: text/PDF files come out byte-identical, Office files
+have the same content but fresh ZIP timestamps.
+
+sample.xlsx is post-processed once with LibreOffice so the SUM formula keeps a
+cached value (SheetJS reads cached values only). If soffice is unavailable the
+workbook is still valid, only the cached value is missing.
+
+The PDF is hand-crafted (uncompressed content streams, Helvetica, 3 pages) so
+the page count and the literal PAGE-n-MARKER strings are deterministic for any
+extractor.
 """
 import json
 import random
 import re
+import shutil
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 FX = Path(__file__).resolve().parent
@@ -95,6 +112,30 @@ ws2["A2"] = 5
 ws2["A3"] = 7
 ws2["A4"] = "=SUM(A2:A3)"
 wb.save(str(FX / "sample.xlsx"))
+
+
+def recalc_xlsx(path):
+    """Give the =SUM formula a cached value the way Excel does."""
+    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    if soffice is None:
+        print("warning: soffice not found; cached formula value stays empty", file=sys.stderr)
+        return
+    with tempfile.TemporaryDirectory(dir=str(FX)) as tmp:
+        subprocess.run(
+            [soffice, "--headless", "--calc", "--convert-to", "xlsx", "--outdir", tmp, str(path)],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        converted = Path(tmp) / path.name
+        if converted.exists():
+            shutil.copyfile(converted, path)
+            print("recalculated:", path.name)
+        else:
+            print("warning: LibreOffice did not produce a recalculated workbook", file=sys.stderr)
+
+
+recalc_xlsx(FX / "sample.xlsx")
 
 # --------------------------------------------------------------- 6. pptx ---
 from pptx import Presentation
@@ -238,6 +279,7 @@ expected = {
         "format": "xlsx",
         "sheets": ["Data", "Second"],
         "substrings": ["Year", "Revenue", "\u041f\u0440\u0438\u0432\u0435\u0442", "MERGED-MARKER"],
+        "formula": {"sheet": "Second", "cell": "A4", "expression": "=SUM(A2:A3)", "cachedValue": 12},
     },
     "sample.pptx": {
         "format": "pptx",
@@ -258,4 +300,7 @@ expected = {
     json.dumps(expected, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
 )
 
-print("generated:", sorted(p.name for p in FX.iterdir()))
+print("fixtures in", FX)
+for path in sorted(FX.iterdir()):
+    if path.is_file():
+        print("  %-16s %6d B" % (path.name, path.stat().st_size))

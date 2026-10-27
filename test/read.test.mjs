@@ -155,3 +155,19 @@ test("doc_meta for xlsx lists sheets", async (t) => {
   assert.equal(meta.format, "xlsx");
   assert.deepEqual(meta.sheets, ["Data", "Second"]);
 });
+
+test("url: private/local address is refused before any request", async () => {
+  for (const url of ["http://127.0.0.1:8080/a.pdf", "http://localhost/a.pdf", "http://192.168.1.10/a.pdf", "http://169.254.169.254/latest"]) {
+    await assert.rejects(() => readDocument({ url }), /private\/local address/);
+  }
+});
+
+test("url: non-http scheme is refused", async () => {
+  await assert.rejects(() => readDocument({ url: "ftp://example.com/a.pdf" }), /only http\(s\) is supported/);
+  await assert.rejects(() => readDocument({ url: "file:///etc/passwd" }), /only http\(s\) is supported/);
+});
+
+test("url: malformed url is refused", async () => {
+  await assert.rejects(() => readDocument({ url: "not a url" }), /invalid URL/);
+});
+
