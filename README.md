@@ -1,8 +1,22 @@
 # dsh-doc-reader
 
+[![CI](https://github.com/reg4916/dsh-doc-reader/actions/workflows/ci.yml/badge.svg)](https://github.com/reg4916/dsh-doc-reader/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/dsh-doc-reader.svg)](https://www.npmjs.com/package/dsh-doc-reader)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Read PDF, DOCX, XLSX, PPTX and text documents as agent tools for **DeepSeek Harness (dsh)**.
 
 The built-in `read` tool returns file text, and `web_fetch` rejects `application/pdf` — so a PDF, a spreadsheet or a slide deck currently ends up as `curl` + `pip install pypdf` inside the session. This plugin closes that gap with five typed tools that return page-, sheet- and slide-aware text, including local OCR for scans and screenshots.
+
+## Screenshots
+
+`doc_read` — page-aware PDF text and spreadsheet rows:
+
+![doc_read output](assets/doc-read.png)
+
+`doc_ocr` — local OCR for scans and images, with per-page confidence:
+
+![doc_ocr output](assets/doc-ocr.png)
 
 ## Tools
 
