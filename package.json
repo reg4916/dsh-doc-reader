@@ -1,7 +1,7 @@
 {
   "name": "dsh-doc-reader",
-  "version": "0.1.0",
-  "description": "Read PDF, DOCX, XLSX, PPTX, TXT/MD/CSV/HTML documents from disk or URL as agent tools — page/sheet/slide aware text extraction for DeepSeek Harness.",
+  "version": "0.2.0",
+  "description": "Read PDF, DOCX, XLSX, PPTX, TXT/MD/CSV/HTML documents from disk or URL as agent tools — page/sheet/slide aware text extraction, plus local OCR for scans and images (DeepSeek Harness).",
   "license": "MIT",
   "author": "reg4916",
   "type": "module",
@@ -43,6 +43,8 @@
     "fast-xml-parser": "^5.11.2",
     "jszip": "^3.10.2",
     "mammoth": "^1.13.0",
+    "pdf-to-img": "^7.0.1",
+    "tesseract.js": "^7.0.0",
     "unpdf": "^1.9.1",
     "xlsx": "^0.18.5"
   },

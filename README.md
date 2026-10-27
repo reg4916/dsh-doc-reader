@@ -2,7 +2,7 @@
 
 Read PDF, DOCX, XLSX, PPTX and text documents as agent tools for **DeepSeek Harness (dsh)**.
 
-The built-in `read` tool returns file text, and `web_fetch` rejects `application/pdf` — so a PDF, a spreadsheet or a slide deck currently ends up as `curl` + `pip install pypdf` inside the session. This plugin closes that gap with four typed tools that return page-, sheet- and slide-aware text.
+The built-in `read` tool returns file text, and `web_fetch` rejects `application/pdf` — so a PDF, a spreadsheet or a slide deck currently ends up as `curl` + `pip install pypdf` inside the session. This plugin closes that gap with five typed tools that return page-, sheet- and slide-aware text, including local OCR for scans and screenshots.
 
 ## Tools
 
@@ -12,6 +12,7 @@ The built-in `read` tool returns file text, and `web_fetch` rejects `application
 | `pdf_read` | PDF page by page with `--- page N/M ---` markers, title/author metadata | `path` \| `url`, `pages` (e.g. `"1-3,7"`), `maxChars` |
 | `xlsx_read` | One block per sheet, tab-separated rows, sheet by name or 1-based index | `path` \| `url`, `sheet`, `maxRows`, `maxChars` |
 | `doc_meta` | Metadata only: format, size, PDF page count/title, DOCX props, XLSX sheets, PPTX slide count | `path` \| `url`, `format` |
+| `doc_ocr` | OCR for scanned PDFs and images (PNG/JPEG/WebP/BMP/TIFF/GIF), per-page confidence | `path` \| `url`, `pages`, `langs`, `scale`, `maxChars` |
 
 Every tool accepts a local path **or** an `http(s)` URL. Prefer `doc_meta` first for large files, then read the pages/sheets you need — output is capped by `maxChars` (default `60000`, hard cap `400000`).
 
@@ -36,6 +37,28 @@ ACME Ltd — Invoice 0042
 1 | Year | Revenue | Note
 2 | 2024 | 1000    | ok
 3 | 2025 | 2000    | Привет
+```
+
+## OCR
+
+`doc_ocr` handles what pure text extraction cannot: scanned PDFs, photos and screenshots.
+
+- Engine: **tesseract.js 7** (WebAssembly, no native OCR binary) — runs fully locally, nothing is uploaded.
+- PDF pages are rasterized with `pdf-to-img` (pdf.js + `@napi-rs/canvas`) at `scale` 2 (~200 DPI), then recognized with one shared worker.
+- Fax-style **CCITT G4 and JBIG2** scans are decoded through pdf.js wasm/JS decoders (`wasmUrl` is wired to the installed `pdfjs-dist/wasm`), so two-tone scans rasterize instead of returning blank pages.
+- Default languages: **`rus+eng`** (`langs` overrides, e.g. `"deu"`, `"eng"`). Order matters: with `eng+rus` tesseract reads uppercase Cyrillic as Latin lookalikes (`ПРИВЕТ` → `NMPUBET`); Cyrillic-first keeps Latin accuracy identical (measured 94–95% on both fixture sets).
+- **First use downloads the language data** (~4 MB per language) into `~/.dsh/cache/dsh-doc-reader/tesseract`; later calls are fast (a page takes ~0.3–1 s). For offline machines set `DSH_DOC_READER_OCR_LANG_PATH` to a directory containing `<lang>.traineddata` (optionally `.gz`), and/or `DSH_DOC_READER_OCR_CACHE` for the cache location.
+- At most **20 PDF pages per call**; narrow with `pages`. Use `scale: 1` for speed, `scale: 3` for small print.
+- Rotation/handwriting/low-resolution scans are best-effort: tesseract has no layout magic, and confidence is reported per page so you can judge the result.
+
+```text
+# scan.pdf — PDF (OCR) · 1.8 MB
+# source: /work/scan.pdf
+# OCR: tesseract rus+eng · pages 1, 2 of 12
+
+--- page 1/12 (ocr, 91.4%) ---
+INVOICE 2026-042
+...
 ```
 
 ## Limits and security
@@ -84,8 +107,8 @@ await readDocument({ path: "report.pdf", pages: "1-3" });
 
 ## Roadmap
 
-- OCR fallback for scanned PDFs (tesseract.js, WASM, no native deps).
 - `.doc`, `.rtf`, `.odt`, `.epub` readers.
+- Layout hints from OCR (word boxes, tables) and page-number citations.
 - Page/sheet images for vision models (`presentResult` image parts).
 - Caching of parsed documents within a session.
 

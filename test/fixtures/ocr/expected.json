@@ -1,0 +1,120 @@
+{
+  "ocr-image.png": {
+    "format": "image",
+    "kind": "image",
+    "extension": "png",
+    "size": [
+      1200,
+      400
+    ],
+    "substrings": [
+      "OCR-IMAGE-MARKER",
+      "Hello from OCR fixture",
+      "Second line 12345"
+    ],
+    "lines": [
+      "OCR-IMAGE-MARKER",
+      "Hello from OCR fixture",
+      "Second line 12345"
+    ],
+    "match": {
+      "ignoreCase": true,
+      "normalizeSpaces": true
+    },
+    "languages": [
+      "eng"
+    ],
+    "may_fail": false
+  },
+  "ocr-image-ru.png": {
+    "format": "image",
+    "kind": "image",
+    "extension": "png",
+    "size": [
+      1200,
+      300
+    ],
+    "substrings": [
+      "ПРИВЕТ",
+      "2026"
+    ],
+    "lines": [
+      "ПРИВЕТ-OCR-МАРКЕР",
+      "Проверка кириллицы 2026"
+    ],
+    "match": {
+      "ignoreCase": true,
+      "normalizeSpaces": true
+    },
+    "languages": [
+      "rus"
+    ],
+    "may_fail": false
+  },
+  "ocr-scan.pdf": {
+    "format": "pdf",
+    "kind": "scanned",
+    "pages": 2,
+    "pageSize": [
+      1240,
+      1754
+    ],
+    "textLayer": false,
+    "substrings": [
+      "SCAN-PAGE-1-MARKER",
+      "SCAN-PAGE-2-MARKER"
+    ],
+    "pageSubstrings": {
+      "1": [
+        "SCAN-PAGE-1-MARKER"
+      ],
+      "2": [
+        "SCAN-PAGE-2-MARKER"
+      ]
+    },
+    "pageLines": {
+      "1": [
+        "SCAN-PAGE-1-MARKER",
+        "Scanned page one",
+        "This PDF has no text layer 111"
+      ],
+      "2": [
+        "SCAN-PAGE-2-MARKER",
+        "Scanned page two",
+        "Only raster images here 222"
+      ]
+    },
+    "match": {
+      "ignoreCase": true,
+      "normalizeSpaces": true
+    },
+    "languages": [
+      "eng"
+    ],
+    "may_fail": false
+  },
+  "ocr-rotated.png": {
+    "format": "image",
+    "kind": "image",
+    "extension": "png",
+    "size": [
+      300,
+      1200
+    ],
+    "rotation": 90,
+    "substrings": [
+      "OCR-ROTATED-MARKER"
+    ],
+    "lines": [
+      "OCR-ROTATED-MARKER"
+    ],
+    "match": {
+      "ignoreCase": true,
+      "normalizeSpaces": true
+    },
+    "languages": [
+      "eng"
+    ],
+    "may_fail": true
+  }
+}

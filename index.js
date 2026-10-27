@@ -6,7 +6,7 @@
  *
  * The readers are pure library code (lib/), so they can be tested without a host.
  */
-import { documentMeta, readDocument } from "./lib/read.js";
+import { documentMeta, ocrDocument, readDocument } from "./lib/read.js";
 
 /**
  * The host resolves @deepseek-ai/dsh-tools for mounted plugins (profile
@@ -41,6 +41,7 @@ const tools = [
     description:
       "Read a document as text. Supports PDF, DOCX, XLSX (sheets rendered as tab-separated rows), PPTX (slides with speaker notes), and TXT/MD/CSV/HTML. " +
       "Use this instead of web_fetch for PDFs — web_fetch rejects application/pdf. " +
+      "For scanned PDFs or screenshots use doc_ocr: text extraction returns '(no extractable text on this page)' for image-only pages. " +
       "For PDFs pass pages to read a subset; for workbooks pass sheet to pick one sheet. " +
       "Large output is truncated at maxChars (default 60000), so narrow the selection instead of re-reading.",
     parameters: {
@@ -146,6 +147,39 @@ const tools = [
         return await documentMeta(args);
       } catch (error) {
         return `doc_meta: ${error?.message ?? error}`;
+      }
+    },
+  }),
+
+  defineTool({
+    name: "doc_ocr",
+    description:
+      "OCR a scanned PDF or a single image (PNG/JPEG/WebP/BMP/TIFF/GIF) and return recognized text. " +
+      "Use it when doc_read reports '(no extractable text)' for a PDF page (scans, photos, screenshots). " +
+      "PDF pages are rasterized at ~200 DPI; pass pages to narrow the batch (max 20 pages per call). " +
+      "The first call downloads tesseract language data (~4 MB per language) into the DSH cache and may take 10-30 s; later calls are fast. " +
+      "Default languages are rus+eng (Cyrillic-first: 'eng+rus' misreads uppercase Cyrillic as Latin lookalikes); pass langs for other scripts (e.g. 'deu', 'eng+deu').",
+    parameters: {
+      path: PATH,
+      url: URL_PARAM,
+      pages: { type: "string", description: 'PDF pages to OCR, e.g. "1-3,5". Default: all pages (limited to 20 per call).' },
+      langs: {
+        type: "string",
+        description: 'Tesseract language codes, "+"-joined. Default "rus+eng" (or DSH_DOC_READER_OCR_LANGS).',
+      },
+      scale: {
+        type: "number",
+        description: "PDF rasterization scale: 1 (fast, small text may suffer) to 3 (slow, small print). Default 2.",
+      },
+      maxChars: { type: "number", description: "Output character cap (default 60000, hard cap 400000)." },
+    },
+    output: textOutput,
+    timeoutMs: 300_000,
+    async execute(args) {
+      try {
+        return await ocrDocument(args);
+      } catch (error) {
+        return `doc_ocr: ${error?.message ?? error}`;
       }
     },
   }),
